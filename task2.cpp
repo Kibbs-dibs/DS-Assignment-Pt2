@@ -17,6 +17,7 @@ struct Spectator {
     char name[50];
 };
 
+// PlayerQueue class to manage player registrations
 class PlayerQueue {
     public:
         Player queue[MAX_PLAYERS];
@@ -132,6 +133,7 @@ class PlayerQueue {
         }
 };
 
+// SpectatorQueue class to manage spectator registrations
 class SpectatorQueue {
     public:
         Spectator queue[MAX_SPECTATORS];
@@ -167,6 +169,58 @@ class SpectatorQueue {
 }
 };
 
+const int MAX_MATCHES = 100;
+
+struct Match {
+    char player1[50];
+    char player2[50];
+    char winner[50];
+};
+
+// MatchStack class to manage match results
+class MatchStack {
+    Match matches[MAX_MATCHES];
+    int top;
+
+public:
+    MatchStack() { top = -1; }
+
+    bool isFull() { return top == MAX_MATCHES - 1; }
+    bool isEmpty() { return top == -1; }
+
+    void pushMatch(const char* p1, const char* p2, const char* winner) {
+        if (isFull()) {
+            cout << "Match stack full.\n";
+            return;
+        }
+        top++;
+        strcpy(matches[top].player1, p1);
+        strcpy(matches[top].player2, p2);
+        strcpy(matches[top].winner, winner);
+        cout << "Match result pushed to stack.\n";
+    }
+
+    void popMatch() {
+        if (isEmpty()) {
+            cout << "No match to pop.\n";
+            return;
+        }
+        cout << "Popped match: " << matches[top].player1 << " vs " << matches[top].player2
+             << ", Winner: " << matches[top].winner << endl;
+        top--;
+    }
+
+    void viewTopMatch() {
+        if (isEmpty()) {
+            cout << "No recent match.\n";
+            return;
+        }
+        cout << "Recent match: " << matches[top].player1 << " vs " << matches[top].player2
+             << ", Winner: " << matches[top].winner << endl;
+    }
+};
+
+// Livestream class to manage livestream status
 class Livestream {
     private:
         bool isLive;
@@ -232,10 +286,58 @@ bool adminLogin() {
     }
 }
 
+const int MAX_RESULTS = 100;
+// ResultLog class to manage match results
+class ResultLog {
+    char stack[MAX_RESULTS][100];
+    char queue[MAX_RESULTS][100];
+    int stackTop, qFront, qRear;
+
+    public:
+        ResultLog() {
+            stackTop = -1;
+            qFront = 0;
+            qRear = -1;
+        }
+
+        void logResult(const char* result) {
+            if (stackTop < MAX_RESULTS - 1) {
+                stackTop++;
+                strcpy(stack[stackTop], result);
+            }
+
+            if ((qRear + 1) % MAX_RESULTS != qFront || qRear == -1) {
+                qRear = (qRear + 1) % MAX_RESULTS;
+                strcpy(queue[qRear], result);
+            }
+
+            cout << "Result logged: " << result << endl;
+        }
+
+        void showRecentResults() {
+            cout << "\n--- Recent Results (Stack) ---\n";
+            for (int i = stackTop; i >= 0; i--) {
+                cout << stack[i] << endl;
+            }
+        }
+
+        void showAllResults() {
+            cout << "\n--- Match History (Queue) ---\n";
+            int i = qFront;
+            while (i != (qRear + 1) % MAX_RESULTS) {
+                cout << queue[i] << endl;
+                i = (i + 1) % MAX_RESULTS;
+            }
+        }
+};
+
+
 int main() {
     PlayerQueue pq;
     SpectatorQueue sq;
+    MatchStack matchStack;
     Livestream stream;
+    ResultLog resultLog;
     int userType;
 
     do {
@@ -262,6 +364,10 @@ int main() {
                         cout << "5. Start Tournament\n";
                         cout << "6. Back to Main Menu\n";
                         cout << "7. View Spectator Queue\n";
+                        cout << "8. Record a Match Result\n";
+                        cout << "9. View Recent Match (Stack)\n";
+                        cout << "10. View All Match History (Queue)\n";
+
                         cout << "Choose an option: ";
                         cin >> choice;
                         cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -283,6 +389,25 @@ int main() {
                                 break;
                             case 6: break;
                             case 7: sq.displaySpectators(); break;
+                            case 8: {
+                                char p1[50], p2[50], winner[50];
+                                cout << "Enter Player 1: "; cin.getline(p1, 50);
+                                cout << "Enter Player 2: "; cin.getline(p2, 50);
+                                cout << "Enter Winner: "; cin.getline(winner, 50);
+                                matchStack.pushMatch(p1, p2, winner);
+
+                                char result[100];
+                                sprintf(result, "%s defeated %s", winner, strcmp(winner, p1) == 0 ? p2 : p1);
+                                resultLog.logResult(result);
+                                break;
+                            }
+                            case 9:
+                                matchStack.viewTopMatch();
+                                break;
+                            case 10:
+                                resultLog.showAllResults();
+                                break;
+
                             default: cout << "Invalid option. Try again.\n";
                         }
                     } while (choice != 6);
