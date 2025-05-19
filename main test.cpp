@@ -222,7 +222,7 @@ public:
 bool validateName(const char* name) {
     if (strlen(name) == 0 || strlen(name) > 49) return false;
     for (size_t i = 0; i < strlen(name); i++) {
-        if (!isalnum(name[i]) return false;
+        if (!isalnum(name[i])) return false;
     }
     return true;
 }
