@@ -27,6 +27,15 @@ bool isTeamAlreadyCheckedIn(const char* teamName) {
     return false;
 }
 
+bool adminLogin() {
+    string username, password;
+    cout << "Enter admin username: ";
+    cin >> username;
+    cout << "Enter admin password: ";
+    cin >> password;
+    return (username == "admin" && password == "1234"); // you can change this
+}
+
 void readRegistrations() {
     ifstream file("apuesport(2.0).csv");
     string line;
@@ -175,4 +184,31 @@ void adminMenu() {
             default: cout << "Invalid option.\n";
         }
     } while (choice != 0);
+}
+
+int main() {
+    readRegistrations();
+
+    while (true) {
+        char option;
+        cout << "\nLogin as (A)dmin or (T)eam or (Q)uit: ";
+        cin >> option;
+
+        if (option == 'A' || option == 'a') {
+            if (adminLogin()) {
+                adminMenu();
+            } else {
+                cout << "Login failed. Returning to main menu.\n";
+            }
+        } else if (option == 'T' || option == 't') {
+            processTeamCheckIn();
+        } else if (option == 'Q' || option == 'q') {
+            cout << "Exiting program.\n";
+            break;
+        } else {
+            cout << "Invalid input.\n";
+        }
+    }
+
+    return 0;
 }

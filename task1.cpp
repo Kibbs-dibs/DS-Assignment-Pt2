@@ -56,25 +56,40 @@ void runQualifiers(Team inTeams[32], Team outQualified[16]) {
 }
 
 void runGroupStage(Team group[4], char groupName) {
-    cout << "\n--- Group " << groupName << " Matches ---\n";
-    for (int i = 0; i < 4; i++) group[i].points = 0;
-    for (int i = 0; i < 4; i++)
-        for (int j = i + 1; j < 4; j++) {
-            char score[10];
-            Team winner = simulateMatch(group[i], group[j], (string("Group ") + groupName).c_str(), 3, score);
-            if (strcmp(winner.name, group[i].name) == 0) group[i].points += 3;
-            else group[j].points += 3;
-        }
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3 - i; j++)
-            if (group[j].points < group[j + 1].points) {
-                Team t = group[j]; group[j] = group[j + 1]; group[j + 1] = t;
-            }
-    cout << "Group " << groupName << " Standings:\n";
+    cout << "\n--- Group " << groupName << " Matches (Bracket Style) ---\n";
+    Team winner1, winner2, elimLoser, finalWinner;
+    char score[10];
+
+    // Opening Matches
+    winner1 = simulateMatch(group[0], group[1], "Opening Match", 3, score);
+    Team loser1 = (strcmp(winner1.name, group[0].name) == 0) ? group[1] : group[0];
+    winner2 = simulateMatch(group[2], group[3], "Opening Match", 3, score);
+    Team loser2 = (strcmp(winner2.name, group[2].name) == 0) ? group[3] : group[2];
+
+    // Winners Match
+    Team firstPlace = simulateMatch(winner1, winner2, "Winners Match", 3, score);
+    Team runnerFromWinners = (strcmp(firstPlace.name, winner1.name) == 0) ? winner2 : winner1;
+
+    // Elimination Match
+    Team survivor = simulateMatch(loser1, loser2, "Elimination Match", 3, score);
+
+    // Decider Match
+    Team secondPlace = simulateMatch(runnerFromWinners, survivor, "Decider Match", 3, score);
+
+    // Scoreboard
+    cout << "\n--- Group " << groupName << " Final Standings ---\n";
+    cout << "1. " << firstPlace.name << " ✅\n";
+    cout << "2. " << secondPlace.name << " ✅\n";
+    cout << "3. " << ((strcmp(runnerFromWinners.name, secondPlace.name) == 0) ? survivor.name : runnerFromWinners.name) << "\n";
+    cout << "4. " << ((strcmp(loser1.name, survivor.name) == 0 || strcmp(loser2.name, survivor.name) == 0) ? ((strcmp(loser1.name, survivor.name) == 0) ? loser2.name : loser1.name) : "?") << "\n";
+
+    // Set points for top 2 only
     for (int i = 0; i < 4; i++) {
-        cout << "  " << (i + 1) << ". " << group[i].name << " (" << group[i].points << " pts)";
-        if (i < 2) cout << "Qualified";
-        cout << "\n";
+        if (strcmp(group[i].name, firstPlace.name) == 0 || strcmp(group[i].name, secondPlace.name) == 0) {
+            group[i].points = 3;
+        } else {
+            group[i].points = 0;
+        }
     }
 }
 

@@ -1,26 +1,29 @@
 #include <iostream>
 #include <queue>
-#include <string>
 using namespace std;
 
 struct Spectator {
     string name;
-    string type; 
+    string type; // VIP, Streamer, General
 };
 
 queue<Spectator> vipQueue;
-queue<Spectator> influencerQueue;
+queue<Spectator> streamerQueue;
 queue<Spectator> generalQueue;
 
-void addSpectator(const string& name, const string& type) {
-    Spectator s = {name, type};
-    if (type == "VIP") vipQueue.push(s);
-    else if (type == "Influencer") influencerQueue.push(s);
+void addSpectator() {
+    Spectator s;
+    cout << "Enter spectator name: ";
+    cin.ignore(); getline(cin, s.name);
+    cout << "Enter type (VIP / Streamer / General): ";
+    getline(cin, s.type);
+    if (s.type == "VIP") vipQueue.push(s);
+    else if (s.type == "Streamer") streamerQueue.push(s);
     else generalQueue.push(s);
-    cout << type << " spectator " << name << " added to queue.\n";
+    cout << "Added to " << s.type << " queue.\n";
 }
 
-void assignSeats(int vipSeats, int influencerSeats, int generalSeats) {
+void assignSeats(int vipSeats, int streamerSeats, int generalSeats) {
     cout << "\n=== Assigning Seats ===\n";
 
     cout << "\nVIP Seats:\n";
@@ -29,10 +32,10 @@ void assignSeats(int vipSeats, int influencerSeats, int generalSeats) {
         vipQueue.pop();
     }
 
-    cout << "\nInfluencer Seats:\n";
-    for (int i = 0; i < influencerSeats && !influencerQueue.empty(); i++) {
-        cout << "  - " << influencerQueue.front().name << endl;
-        influencerQueue.pop();
+    cout << "\nStreamer Seats:\n";
+    for (int i = 0; i < streamerSeats && !streamerQueue.empty(); i++) {
+        cout << "  - " << streamerQueue.front().name << endl;
+        streamerQueue.pop();
     }
 
     cout << "\nGeneral Spectator Seats:\n";
@@ -40,25 +43,51 @@ void assignSeats(int vipSeats, int influencerSeats, int generalSeats) {
         cout << "  - " << generalQueue.front().name << endl;
         generalQueue.pop();
     }
-
-    cout << "\nViewing slots have been filled.\n";
 }
 
-void displayQueues() {
+void setupViewingSlots() {
+    int slots;
+    cout << "\nEnter number of live stream slots: ";
+    cin >> slots;
+    cout << "\nAssigning Live Stream Slots (Streamers Only)\n";
+    for (int i = 1; i <= slots && !streamerQueue.empty(); i++) {
+        cout << "Slot " << i << ": " << streamerQueue.front().name << " (Streamer)\n";
+        streamerQueue.pop();
+    }
+}
+
+void viewSpectatorQueues() {
     cout << "\nQueue Sizes:\n";
     cout << "  VIP: " << vipQueue.size() << "\n";
-    cout << "  Influencer: " << influencerQueue.size() << "\n";
+    cout << "  Streamer: " << streamerQueue.size() << "\n";
     cout << "  General: " << generalQueue.size() << "\n";
 }
 
-int main() {
-    addSpectator("Alice", "VIP");
-    addSpectator("Bob", "Influencer");
-    addSpectator("Charlie", "General");
-    addSpectator("Dave", "VIP");
-
-    displayQueues();
-    assignSeats(2, 1, 2);
-
-    return 0;
+void spectatorMenu() {
+    int opt;
+    do {
+        cout << "\n=== Spectator Queue Management ===\n";
+        cout << "1. Add Spectator\n";
+        cout << "2. Assign Seats\n";
+        cout << "3. View Queue Sizes\n";
+        cout << "4. Organize Live Stream Slots\n";
+        cout << "0. Back\n";
+        cout << "Choice: ";
+        cin >> opt;
+        switch (opt) {
+            case 1: addSpectator(); break;
+            case 2: {
+                int v, s, g;
+                cout << "Enter VIP seats: "; cin >> v;
+                cout << "Enter Streamer seats: "; cin >> s;
+                cout << "Enter General seats: "; cin >> g;
+                assignSeats(v, s, g);
+                break;
+            }
+            case 3: viewSpectatorQueues(); break;
+            case 4: setupViewingSlots(); break;
+            case 0: break;
+            default: cout << "Invalid option.\n";
+        }
+    } while (opt != 0);
 }
