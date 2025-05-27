@@ -8,6 +8,11 @@
 #include <queue>
 using namespace std;
 
+struct Team;
+int calculateTeamStrength(Team &t);
+void logMatch(string stage, string teamA, string teamB, string score, string winner);
+void performanceMenu();
+
 struct Player {
     char name[50];
     char rank[20];
@@ -25,6 +30,17 @@ struct Spectator {
     string type; 
 };
 
+struct MatchLog {
+    string stage;
+    string teamA;
+    string teamB;
+    string score;
+    string winner;
+};
+
+MatchLog matchHistory[200];
+int matchCount = 0;
+map<string, int> teamWins;
 Team registrationQueue[64], checkedIn[32];
 int regCount = 0, checkedCount = 0;
 
@@ -106,13 +122,28 @@ void adminSingleCheckIn() {
         cout << "Tournament is full (32 teams).\n";
         return;
     }
+
     char name[50];
     cout << "Enter team name to check in: ";
     cin.ignore();
     cin.getline(name, 50);
+
     for (int i = 0; i < regCount; i++) {
         if (strcmp(registrationQueue[i].name, name) == 0) {
             if (!isTeamAlreadyCheckedIn(name)) {
+                // Ask for priority level
+                string priority;
+                cout << "Enter registration type (earlybird/wildcard): ";
+                cin >> priority;
+                if (priority == "earlybird")
+                    strcpy(registrationQueue[i].regType, "earlybird");
+                else if (priority == "wildcard")
+                    strcpy(registrationQueue[i].regType, "wildcard");
+                else {
+                    cout << "Invalid type. Defaulting to general.\n";
+                    strcpy(registrationQueue[i].regType, "general");
+                }
+
                 checkedIn[checkedCount++] = registrationQueue[i];
                 cout << name << " has been checked in.\n";
             } else cout << "Team is already checked in.\n";
@@ -150,18 +181,41 @@ void withdrawAndReplace() {
 }
 
 void processTeamCheckIn() {
-    if (checkedCount >= 32) { cout << "Tournament is full.\n"; return; }
+    if (checkedCount >= 32) {
+        cout << "Tournament is full.\n";
+        return;
+    }
     char name[50];
     cout << "Enter your team name: ";
-    cin.ignore(); cin.getline(name, 50);
+    cin.ignore();
+    cin.getline(name, 50);
     for (int i = 0; i < regCount; i++) {
         if (strcmp(registrationQueue[i].name, name) == 0) {
             if (!isTeamAlreadyCheckedIn(name)) {
+                // Ask for priority level
+                string priority;
+                cout << "Enter registration type (earlybird/wildcard): ";
+                cin >> priority;
+                if (priority == "earlybird")
+                    strcpy(registrationQueue[i].regType, "earlybird");
+                else if (priority == "wildcard")
+                    strcpy(registrationQueue[i].regType, "wildcard");
+                else {
+                    cout << "Invalid type. Defaulting to general.\n";
+                    strcpy(registrationQueue[i].regType, "general");
+                }
+
                 checkedIn[checkedCount++] = registrationQueue[i];
                 cout << name << " checked in successfully.\n";
                 viewCheckedInTeams();
-                if (checkedCount == 32) startTournament(); // ✅ Will now compile
-            } else cout << "Already checked in.\n";
+
+                if (checkedCount == 32) {
+                    cout << "\nAll 32 teams have been registered.\n";
+                    cout << "Waiting for Admin to start the tournament.\n";
+                }
+            } else {
+                cout << "Already checked in.\n";
+            }
             return;
         }
     }
@@ -177,6 +231,8 @@ void adminMenu() {
         cout << "2. Withdraw and replace a team\n";
         cout << "3. View checked-in teams\n";
         cout << "4. Spectator Management\n";
+        cout << "5. Start Tournament\n";
+        cout << "6. Match Logs & Team Performance\n";
         cout << "0. Exit\n";
         cout << "Choice: ";
         cin >> choice;
@@ -185,6 +241,8 @@ void adminMenu() {
             case 2: withdrawAndReplace(); break;
             case 3: viewCheckedInTeams(); break;
             case 4: spectatorMenu(); break;
+            case 5: startTournament(); break;
+            case 6: performanceMenu(); break;
             case 0: cout << "Returning to login menu.\n"; break;
             default: cout << "Invalid option.\n";
         }
@@ -200,6 +258,8 @@ Team simulateMatch(Team &a, Team &b, const char *stage, int bestOf, char scoreOu
     }
     sprintf(scoreOutput, "(%d-%d)", winsA, winsB);
     cout << stage << " - Match: " << a.name << " vs " << b.name << " " << scoreOutput << endl;
+    string winnerName = (winsA > winsB) ? a.name : b.name;
+    logMatch(stage, a.name, b.name, scoreOutput, winnerName);
     return (winsA > winsB) ? a : b;
 }
 
@@ -246,29 +306,73 @@ void showChampion(Team &champion) {
 }
 
 void startTournament() {
+        if (checkedCount < 32) {
+        cout << "\nCannot start tournament. Only " << checkedCount << " teams registered. Need 32.\n";
+        return;
+    }
+    string input;
     Team qualified[16];
     cout << "\n=== QUALIFIERS ROUND ===\n";
     char score[10];
     int q = 0;
     for (int i = 0; i < 32; i += 2)
         qualified[q++] = simulateMatch(checkedIn[i], checkedIn[i + 1], "Qualifiers", 1, score);
+
+    cout << "\nQualifiers completed.\n";
+    cout << "Type 'proceed' to continue to Group Stage or any other key to cancel: ";
+    cin >> input;
+    if (input != "proceed") {
+        cout << "Tournament paused after Qualifiers.\n";
+        return;
+    }
+
     Team groupA[4], groupB[4], groupC[4], groupD[4];
     memcpy(groupA, qualified, 4 * sizeof(Team));
     memcpy(groupB, qualified + 4, 4 * sizeof(Team));
     memcpy(groupC, qualified + 8, 4 * sizeof(Team));
     memcpy(groupD, qualified + 12, 4 * sizeof(Team));
+
     runGroupStage(groupA, 'A');
     runGroupStage(groupB, 'B');
     runGroupStage(groupC, 'C');
     runGroupStage(groupD, 'D');
+
     Team top8[8]; int idx = 0;
     for (int g = 0; g < 4; g++) {
         Team* group = (g == 0 ? groupA : g == 1 ? groupB : g == 2 ? groupC : groupD);
         for (int i = 0; i < 4; i++)
-            if (group[i].points == 3) top8[idx++] = group[i];
+            if (group[i].points == 3)
+                top8[idx++] = group[i];
     }
-    Team champion = runPlayoffs(top8);
+
+    cout << "\nGroup Stage completed.\n";
+    cout << "Type 'proceed' to continue to Playoffs (Quarterfinals) or any other key to cancel: ";
+    cin >> input;
+    if (input != "proceed") {
+        cout << "Tournament paused after Group Stage.\n";
+        return;
+    }
+
+    const char* rounds[] = {"Quarterfinal", "Semifinal", "Final"};
+    Team round[8]; memcpy(round, top8, 8 * sizeof(Team));
+    for (int r = 0, size = 8; r < 3; r++) {
+        Team next[4]; int idx = 0;
+        cout << rounds[r] << "s ready.\n";
+        cout << "Type 'proceed' to play the " << rounds[r] << " or any other key to cancel: ";
+        cin >> input;
+        if (input != "proceed") {
+            cout << "Tournament paused before " << rounds[r] << "s.\n";
+            return;
+        }
+        for (int i = 0; i < size; i += 2)
+            next[idx++] = simulateMatch(round[i], round[i + 1], rounds[r], 5, score);
+        memcpy(round, next, idx * sizeof(Team));
+        size = idx;
+    }
+
+    Team champion = round[0];
     showChampion(champion);
+
 }
 
 void addSpectator() {
@@ -286,10 +390,10 @@ void addSpectator() {
     } else if (s.type == "General") {
         generalQueue.push(s);
     } else {
-        cout << "❌ Invalid type. Please enter VIP, Streamer, or General.\n";
+        cout << "Invalid type. Please enter VIP, Streamer, or General.\n";
         return;
     }
-    cout << "✅ Added to " << s.type << " queue.\n";
+    cout << "Added to " << s.type << " queue.\n";
 }
 
 void assignSeats() {
@@ -298,7 +402,6 @@ void assignSeats() {
 
     if (!initialized) {
         cout << "Enter VIP seats: "; cin >> vipSeats;
-        cout << "Enter Streamer seats: "; cin >> streamerSeats;
         cout << "Enter General seats: "; cin >> generalSeats;
         initialized = true;
     }
@@ -311,13 +414,6 @@ void assignSeats() {
         cout << "  - " << s.name << endl;
         assignedVIPs[vipCount++] = s;
         vipQueue.pop();
-    }
-
-    cout << "\nStreamer Seats:\n";
-    for (int i = 0; i < streamerSeats && !streamerQueue.empty(); i++) {
-        Spectator s = streamerQueue.front();
-        assignedStreamers[streamCount++] = s;
-        streamerQueue.pop();
     }
 
     cout << "\nGeneral Spectator Seats:\n";
@@ -333,7 +429,7 @@ void setupViewingSlots() {
     int slots;
     cout << "\nEnter number of live stream slots: ";
     cin >> slots;
-    cout << "\n🎥 Live stream slots have been allocated.\n";
+    cout << "\nLive stream slots have been allocated.\n";
     for (int i = 1; i <= slots && streamCount < 100; i++) {
         if (!streamerQueue.empty()) {
             assignedStreamers[streamCount++] = streamerQueue.front();
@@ -360,7 +456,7 @@ void viewAssignedSpectators() {
 void viewLiveStreamers() {
     cout << "\n=== Assigned Streamers for Live Slots ===\n";
     for (int i = 0; i < streamCount; i++)
-        cout << "🎥 Slot " << (i + 1) << ": " << assignedStreamers[i].name << endl;
+        cout << "Slot " << (i + 1) << ": " << assignedStreamers[i].name << endl;
 }
 
 void spectatorMenu() {
@@ -369,24 +465,78 @@ void spectatorMenu() {
         cout << "\n=== Spectator Queue Management ===\n";
         cout << "1. Add Spectator\n";
         cout << "2. Assign Seats\n";
-        cout << "3. View Queue Sizes\n";
-        cout << "4. Organize Live Stream Slots\n";
+        cout << "3. Organize Live Stream Slots \n";
+        cout << "4. View Queue Sizes\n";
         cout << "5. View Seated Spectators (VIP/General)\n";
-        cout << "6. View Assigned Live Streamers\n";
+        cout << "6. View Live Streamers\n";
         cout << "0. Back\n";
         cout << "Choice: ";
         cin >> opt;
         switch (opt) {
             case 1: addSpectator(); break;
             case 2: assignSeats(); break;
-            case 3: viewSpectatorQueues(); break;
-            case 4: setupViewingSlots(); break;
+            case 3: setupViewingSlots(); break;
+            case 4: viewSpectatorQueues(); break;
             case 5: viewAssignedSpectators(); break;
             case 6: viewLiveStreamers(); break;
             case 0: break;
             default: cout << "Invalid option.\n";
         }
     } while (opt != 0);
+}
+
+void logMatch(string stage, string teamA, string teamB, string score, string winner) {
+    MatchLog log;
+    log.stage = stage;
+    log.teamA = teamA;
+    log.teamB = teamB;
+    log.score = score;
+    log.winner = winner;
+    matchHistory[matchCount++] = log;
+    teamWins[winner]++;
+
+    // Save to file
+    ofstream outFile("match_logs.txt", ios::app);
+    if (outFile.is_open()) {
+        outFile << stage << "," << teamA << "," << teamB << "," << score << "," << winner << "\n";
+        outFile.close();
+    }
+}
+
+
+void viewMatchHistory() {
+    cout << "\n=== Match History ===\n";
+    for (int i = 0; i < matchCount; i++) {
+        cout << "[" << matchHistory[i].stage << "] ";
+        cout << matchHistory[i].teamA << " vs " << matchHistory[i].teamB;
+        cout << " " << matchHistory[i].score << " -> Winner: ";
+        cout << matchHistory[i].winner << "\n";
+    }
+}
+
+void viewTeamPerformance() {
+    cout << "\n=== Team Win Summary ===\n";
+    for (auto &entry : teamWins) {
+        cout << entry.first << " -> " << entry.second << " wins\n";
+    }
+}
+
+void performanceMenu() {
+    int choice;
+    do {
+        cout << "\n=== Admin Menu: Match Logs & Performance ===\n";
+        cout << "1. View Match History\n";
+        cout << "2. View Team Performance Summary\n";
+        cout << "0. Back\n";
+        cout << "Choice: ";
+        cin >> choice;
+        switch (choice) {
+            case 1: viewMatchHistory(); break;
+            case 2: viewTeamPerformance(); break;
+            case 0: break;
+            default: cout << "Invalid option.\n";
+        }
+    } while (choice != 0);
 }
 
 int main() {
@@ -402,7 +552,7 @@ int main() {
         } else if (opt == 'T' || opt == 't') {
             processTeamCheckIn();
         } else if (opt == 'Q' || opt == 'q') {
-            cout << "Goodbye!\n"; break;
+            cout << "Goodbye and Have A Nice Day!\n"; break;
         } else {
             cout << "Invalid input.\n";
         }
