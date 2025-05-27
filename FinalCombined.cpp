@@ -495,7 +495,6 @@ void logMatch(string stage, string teamA, string teamB, string score, string win
     matchHistory[matchCount++] = log;
     teamWins[winner]++;
 
-    // Save to file
     ofstream outFile("match_logs.txt", ios::app);
     if (outFile.is_open()) {
         outFile << stage << "," << teamA << "," << teamB << "," << score << "," << winner << "\n";
@@ -524,7 +523,7 @@ void viewTeamPerformance() {
 void performanceMenu() {
     int choice;
     do {
-        cout << "\n=== Admin Menu: Match Logs & Performance ===\n";
+        cout << "\n=== Match Logs & Performance ===\n";
         cout << "1. View Match History\n";
         cout << "2. View Team Performance Summary\n";
         cout << "0. Back\n";
