@@ -28,9 +28,10 @@ bool adminLogin() {
 }
 
 bool isTeamAlreadyCheckedIn(const char* teamName) {
-    for (int i = 0; i < checkedCount; i++)
+    for (int i = 0; i < checkedCount; i++) {
         if (strcmp(checkedIn[i].name, teamName) == 0)
             return true;
+    }
     return false;
 }
 
@@ -65,80 +66,91 @@ void viewCheckedInTeams() {
     cout << "Total: " << checkedCount << "/32 teams\n";
 }
 
+void viewAllUnregisteredTeams() {
+    cout << "\n=== Unchecked-In Registered Teams ===\n";
+    for (int i = 0; i < regCount; i++) {
+        if (!isTeamAlreadyCheckedIn(registrationQueue[i].name)) {
+            cout << i + 1 << ". " << registrationQueue[i].name << endl;
+        }
+    }
+}
+
 void adminSingleCheckIn() {
     if (checkedCount >= 32) {
         cout << "Tournament is full (32 teams).\n";
         return;
     }
 
-    char name[50];
-    cout << "Enter team name to check in: ";
+    viewAllUnregisteredTeams();
+
+    int choice;
+    cout << "\nSelect team number to check in: ";
+    cin >> choice;
     cin.ignore();
-    cin.getline(name, 50);
 
-    for (int i = 0; i < regCount; i++) {
-        if (strcmp(registrationQueue[i].name, name) == 0) {
-            if (!isTeamAlreadyCheckedIn(name)) {
-                // Ask for priority level
-                string priority;
-                cout << "Enter registration type (earlybird/wildcard): ";
-                cin >> priority;
-                if (priority == "earlybird")
-                    strcpy(registrationQueue[i].regType, "earlybird");
-                else if (priority == "wildcard")
-                    strcpy(registrationQueue[i].regType, "wildcard");
-                else {
-                    cout << "Invalid type. Defaulting to general.\n";
-                    strcpy(registrationQueue[i].regType, "general");
-                }
-
-                checkedIn[checkedCount++] = registrationQueue[i];
-                cout << name << " has been checked in.\n";
-            } else cout << "Team is already checked in.\n";
-            return;
-        }
-    }
-    cout << "Team not found in registration file.\n";
-}
-
-void withdrawAndReplace() {
-    viewCheckedInTeams();
-    cout << "Enter team name to withdraw: ";
-    char target[50];
-    cin.ignore();
-    cin.getline(target, 50);
-    int found = -1;
-    for (int i = 0; i < checkedCount; i++) {
-        if (strcmp(checkedIn[i].name, target) == 0) {
-            found = i;
-            break;
-        }
-    }
-    if (found == -1) {
-        cout << "Team not found.\n";
+    if (choice < 1 || choice > regCount || isTeamAlreadyCheckedIn(registrationQueue[choice - 1].name)) {
+        cout << "Invalid selection or team already checked in.\n";
         return;
     }
 
-    bool replaced = false;
-    for (int i = 0; i < regCount; i++) {
-        if (strcmp(registrationQueue[i].regType, "wildcard") == 0 &&
-            !isTeamAlreadyCheckedIn(registrationQueue[i].name)) {
-            cout << "Replacing with wildcard team: " << registrationQueue[i].name << "\n";
-            checkedIn[found] = registrationQueue[i];
-            replaced = true;
-            break;
-        }
+    string priority;
+    cout << "Enter registration type (earlybird/wildcard): ";
+    cin >> priority;
+    if (priority == "earlybird")
+        strcpy(registrationQueue[choice - 1].regType, "earlybird");
+    else if (priority == "wildcard")
+        strcpy(registrationQueue[choice - 1].regType, "wildcard");
+    else {
+        cout << "Invalid type. Defaulting to general.\n";
+        strcpy(registrationQueue[choice - 1].regType, "general");
     }
 
-    if (!replaced) {
-        for (int i = found; i < checkedCount - 1; i++)
-            checkedIn[i] = checkedIn[i + 1];
-        checkedCount--;
-        cout << "No wildcard teams left. Slot removed.\n";
-    } else {
-        cout << "Replacement successful.\n";
+    checkedIn[checkedCount++] = registrationQueue[choice - 1];
+    cout << registrationQueue[choice - 1].name << " has been checked in.\n";
+}
+
+void withdrawAndReplace() {
+    cout << "\n--- Withdraw and Replace ---\n";
+    for (int i = 0; i < checkedCount; i++) {
+        cout << i + 1 << ". " << checkedIn[i].name << endl;
     }
-    viewCheckedInTeams();
+
+    int withdrawChoice;
+    cout << "Enter team number to withdraw: ";
+    cin >> withdrawChoice;
+    cin.ignore();
+
+    if (withdrawChoice < 1 || withdrawChoice > checkedCount) {
+        cout << "Invalid choice.\n";
+        return;
+    }
+
+    viewAllUnregisteredTeams();
+
+    int replaceChoice;
+    cout << "Enter replacement team number: ";
+    cin >> replaceChoice;
+    cin.ignore();
+
+    if (replaceChoice < 1 || replaceChoice > regCount || isTeamAlreadyCheckedIn(registrationQueue[replaceChoice - 1].name)) {
+        cout << "Invalid or already checked-in team.\n";
+        return;
+    }
+
+    string priority;
+    cout << "Enter registration type for replacement (earlybird/wildcard): ";
+    cin >> priority;
+    if (priority == "earlybird")
+        strcpy(registrationQueue[replaceChoice - 1].regType, "earlybird");
+    else if (priority == "wildcard")
+        strcpy(registrationQueue[replaceChoice - 1].regType, "wildcard");
+    else {
+        cout << "Invalid type. Defaulting to general.\n";
+        strcpy(registrationQueue[replaceChoice - 1].regType, "general");
+    }
+
+    checkedIn[withdrawChoice - 1] = registrationQueue[replaceChoice - 1];
+    cout << "Replaced with " << registrationQueue[replaceChoice - 1].name << endl;
 }
 
 void processTeamCheckIn() {
@@ -146,41 +158,38 @@ void processTeamCheckIn() {
         cout << "Tournament is full.\n";
         return;
     }
-    char name[50];
-    cout << "Enter your team name: ";
+
+    viewAllUnregisteredTeams();
+
+    int choice;
+    cout << "\nSelect your team number: ";
+    cin >> choice;
     cin.ignore();
-    cin.getline(name, 50);
-    for (int i = 0; i < regCount; i++) {
-        if (strcmp(registrationQueue[i].name, name) == 0) {
-            if (!isTeamAlreadyCheckedIn(name)) {
-                // Ask for priority level
-                string priority;
-                cout << "Enter registration type (earlybird/wildcard): ";
-                cin >> priority;
-                if (priority == "earlybird")
-                    strcpy(registrationQueue[i].regType, "earlybird");
-                else if (priority == "wildcard")
-                    strcpy(registrationQueue[i].regType, "wildcard");
-                else {
-                    cout << "Invalid type. Defaulting to general.\n";
-                    strcpy(registrationQueue[i].regType, "general");
-                }
 
-                checkedIn[checkedCount++] = registrationQueue[i];
-                cout << name << " checked in successfully.\n";
-                viewCheckedInTeams();
-
-                if (checkedCount == 32) {
-                    cout << "\nAll 32 teams have been registered.\n";
-                    cout << "Waiting for Admin to start the tournament.\n";
-                }
-            } else {
-                cout << "Already checked in.\n";
-            }
-            return;
-        }
+    if (choice < 1 || choice > regCount || isTeamAlreadyCheckedIn(registrationQueue[choice - 1].name)) {
+        cout << "Invalid selection or already checked in.\n";
+        return;
     }
-    cout << "Team not found in registration list.\n";
+
+    string priority;
+    cout << "Enter registration type (earlybird/wildcard): ";
+    cin >> priority;
+    if (priority == "earlybird")
+        strcpy(registrationQueue[choice - 1].regType, "earlybird");
+    else if (priority == "wildcard")
+        strcpy(registrationQueue[choice - 1].regType, "wildcard");
+    else {
+        cout << "Invalid type. Defaulting to general.\n";
+        strcpy(registrationQueue[choice - 1].regType, "general");
+    }
+
+    checkedIn[checkedCount++] = registrationQueue[choice - 1];
+    cout << registrationQueue[choice - 1].name << " checked in successfully.\n";
+
+    if (checkedCount == 32) {
+        cout << "\nAll 32 teams have been registered.\n";
+        cout << "Waiting for Admin to start the tournament.\n";
+    }
 }
 
 void adminMenu() {

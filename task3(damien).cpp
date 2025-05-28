@@ -5,122 +5,170 @@ using namespace std;
 
 struct Spectator {
     string name;
-    string type;
+    string type;  // VIP / Streamer / General
+    string stage; // Qualifiers / Group Stage / Quarterfinal / Semifinal / Grand Final
 };
 
-queue<Spectator> vipQueue;
-queue<Spectator> streamerQueue;
-queue<Spectator> generalQueue;
-Spectator assignedVIPs[100]; int vipCount = 0;
-Spectator assignedGenerals[100]; int generalCount = 0;
-Spectator assignedStreamers[100]; int streamCount = 0;
+string stages[] = {"Qualifiers", "Group Stage", "Quarterfinal", "Semifinal", "Grand Final"};
+const int MAX = 100;
+
+queue<Spectator> vipQueues[5];
+queue<Spectator> generalQueues[5];
+queue<Spectator> streamerQueues[5];
+
+Spectator seatedVIPs[5][MAX];     int vipCounts[5] = {0};
+Spectator seatedGenerals[5][MAX]; int generalCounts[5] = {0};
+Spectator seatedStreamers[5][MAX];int streamerCounts[5] = {0};
+
+int vipSeats = 0, generalSeats = 0, streamSlots = 0;
+bool seatsAssigned = false, streamsAssigned = false;
+
+int getStageIndex(string stageName) {
+    for (int i = 0; i < 5; i++)
+        if (stages[i] == stageName)
+            return i;
+    return -1;
+}
 
 void addSpectator() {
     Spectator s;
     cin.ignore();
     cout << "Enter spectator name: ";
     getline(cin, s.name);
-    cout << "Enter type (VIP / Streamer / General): ";
+
+    cout << "The Seats Types (VIP / Streamer / General): ";
     getline(cin, s.type);
 
-    if (s.type == "VIP") {
-        vipQueue.push(s);
-    } else if (s.type == "Streamer") {
-        streamerQueue.push(s);
-    } else if (s.type == "General") {
-        generalQueue.push(s);
-    } else {
-        cout << "Invalid type. Please enter VIP, Streamer, or General.\n";
+    cout << "Enter Stage (Qualifiers / Group Stage / Quarterfinal / Semifinal / Grand Final): ";
+    getline(cin, s.stage);
+
+    int index = getStageIndex(s.stage);
+    if (index == -1) {
+        cout << "Invalid stage.\n";
         return;
     }
-    cout << "Added to " << s.type << " queue.\n";
+
+    if (s.type == "VIP")
+        vipQueues[index].push(s);
+    else if (s.type == "General")
+        generalQueues[index].push(s);
+    else if (s.type == "Streamer")
+        streamerQueues[index].push(s);
+    else {
+        cout << "Invalid type.\n";
+        return;
+    }
+
+    cout << "Added to " << s.type << " queue for " << s.stage << ".\n";
 }
 
 void assignSeats() {
-    static bool initialized = false;
-    static int vipSeats, streamerSeats, generalSeats;
-
-    if (!initialized) {
-        cout << "Enter VIP seats: "; cin >> vipSeats;
-        cout << "Enter General seats: "; cin >> generalSeats;
-        initialized = true;
+    if (!seatsAssigned) {
+        cout << "Enter number of VIP seats per stage: ";
+        cin >> vipSeats;
+        cout << "Enter number of General seats per stage: ";
+        cin >> generalSeats;
+        seatsAssigned = true;
     }
 
-    cout << "\n=== Assigning Seats ===\n";
+    for (int i = 0; i < 5; i++) {
+        cout << "\nAssigning seats for " << stages[i] << "...\n";
 
-    cout << "\nVIP Seats:\n";
-    for (int i = 0; i < vipSeats && !vipQueue.empty(); i++) {
-        Spectator s = vipQueue.front();
-        cout << "  - " << s.name << endl;
-        assignedVIPs[vipCount++] = s;
-        vipQueue.pop();
-    }
+        // VIP
+        for (int j = 0; j < vipSeats && !vipQueues[i].empty(); j++) {
+            Spectator s = vipQueues[i].front(); vipQueues[i].pop();
+            seatedVIPs[i][vipCounts[i]++] = s;
+            cout << "VIP: " << s.name << endl;
+        }
 
-    cout << "\nGeneral Spectator Seats:\n";
-    for (int i = 0; i < generalSeats && !generalQueue.empty(); i++) {
-        Spectator s = generalQueue.front();
-        cout << "  - " << s.name << endl;
-        assignedGenerals[generalCount++] = s;
-        generalQueue.pop();
+        // General
+        for (int j = 0; j < generalSeats && !generalQueues[i].empty(); j++) {
+            Spectator s = generalQueues[i].front(); generalQueues[i].pop();
+            seatedGenerals[i][generalCounts[i]++] = s;
+            cout << "General: " << s.name << endl;
+        }
     }
 }
 
 void setupViewingSlots() {
-    int slots;
-    cout << "\nEnter number of live stream slots: ";
-    cin >> slots;
-    cout << "\nLive stream slots have been allocated.\n";
-    for (int i = 1; i <= slots && streamCount < 100; i++) {
-        if (!streamerQueue.empty()) {
-            assignedStreamers[streamCount++] = streamerQueue.front();
-            streamerQueue.pop();
+    if (!streamsAssigned) {
+        cout << "Enter number of streamers per stage: ";
+        cin >> streamSlots;
+        streamsAssigned = true;
+    }
+
+    for (int i = 0; i < 5; i++) {
+        cout << "\nAssigning streamers for " << stages[i] << "...\n";
+        for (int j = 0; j < streamSlots && !streamerQueues[i].empty(); j++) {
+            Spectator s = streamerQueues[i].front(); streamerQueues[i].pop();
+            seatedStreamers[i][streamerCounts[i]++] = s;
+            cout << s.name << endl;
         }
     }
 }
 
 void viewSpectatorQueues() {
-    cout << "\nQueue Sizes:\n";
-    cout << "  VIP: " << vipQueue.size() << "\n";
-    cout << "  Streamer: " << streamerQueue.size() << "\n";
-    cout << "  General: " << generalQueue.size() << "\n";
+    cout << "\n=== Queue Sizes by Stage ===\n";
+    for (int i = 0; i < 5; i++) {
+        cout << "\n[" << stages[i] << "]\n";
+        cout << "  VIP Queue: " << vipQueues[i].size() << "\n";
+        cout << "  General Queue: " << generalQueues[i].size() << "\n";
+        cout << "  Streamer Queue: " << streamerQueues[i].size() << "\n";
+    }
 }
 
 void viewAssignedSpectators() {
-    cout << "\n=== Assigned VIPs and General Spectators ===\n";
-    cout << "VIP Spectators:\n";
-    for (int i = 0; i < vipCount; i++) cout << "  - " << assignedVIPs[i].name << endl;
-    cout << "General Spectators:\n";
-    for (int i = 0; i < generalCount; i++) cout << "  - " << assignedGenerals[i].name << endl;
+    cout << "\n=== Seated VIP & General Spectators ===\n";
+    for (int i = 0; i < 5; i++) {
+        cout << "\n[" << stages[i] << "]\n";
+        cout << "VIPs:\n";
+        for (int j = 0; j < vipCounts[i]; j++)
+            cout << "  - " << seatedVIPs[i][j].name << endl;
+
+        cout << "Generals:\n";
+        for (int j = 0; j < generalCounts[i]; j++)
+            cout << "  - " << seatedGenerals[i][j].name << endl;
+    }
 }
 
 void viewLiveStreamers() {
-    cout << "\n=== Assigned Streamers for Live Slots ===\n";
-    for (int i = 0; i < streamCount; i++)
-        cout << "\U0001F3A5 Slot " << (i + 1) << ": " << assignedStreamers[i].name << endl;
+    cout << "\n=== Seated Streamers ===\n";
+    for (int i = 0; i < 5; i++) {
+        cout << "\n[" << stages[i] << "]\n";
+        for (int j = 0; j < streamerCounts[i]; j++) {
+            cout << seatedStreamers[i][j].name << endl;
+        }
+    }
 }
 
-void spectatorMenu() {
-    int opt;
+void showMenu() {
+    int choice;
     do {
         cout << "\n=== Spectator Queue Management ===\n";
         cout << "1. Add Spectator\n";
         cout << "2. Assign Seats\n";
-        cout << "3. View Queue Sizes\n";
-        cout << "4. Organize Live Stream Slots\n";
+        cout << "3. Organize Live Stream Slots\n";
+        cout << "4. View Queue Sizes\n";
         cout << "5. View Seated Spectators (VIP/General)\n";
-        cout << "6. View Assigned Live Streamers\n";
-        cout << "0. Back\n";
+        cout << "6. View Live Streamers\n";
+        cout << "0. Exit\n";
         cout << "Choice: ";
-        cin >> opt;
-        switch (opt) {
+        cin >> choice;
+
+        switch (choice) {
             case 1: addSpectator(); break;
             case 2: assignSeats(); break;
-            case 3: viewSpectatorQueues(); break;
-            case 4: setupViewingSlots(); break;
+            case 3: setupViewingSlots(); break;
+            case 4: viewSpectatorQueues(); break;
             case 5: viewAssignedSpectators(); break;
             case 6: viewLiveStreamers(); break;
-            case 0: break;
-            default: cout << "Invalid option.\n";
+            case 0: cout << "Exiting...\n"; break;
+            default: cout << "Invalid choice.\n"; break;
         }
-    } while (opt != 0);
+    } while (choice != 0);
+}
+
+int main() {
+    showMenu();
+    return 0;
 }

@@ -5,6 +5,7 @@ using namespace std;
 
 struct MatchLog {
     string stage;
+    string group;  // Group A, B, C, D or empty
     string teamA;
     string teamB;
     string score;
@@ -15,9 +16,10 @@ MatchLog matchHistory[200];
 int matchCount = 0;
 map<string, int> teamWins;
 
-void logMatch(string stage, string teamA, string teamB, string score, string winner) {
+void logMatch(string stage, string teamA, string teamB, string score, string winner, string group = "") {
     MatchLog log;
     log.stage = stage;
+    log.group = group;
     log.teamA = teamA;
     log.teamB = teamB;
     log.score = score;
@@ -30,14 +32,10 @@ void viewMatchHistory() {
     cout << "\n=== Match History ===\n";
     for (int i = 0; i < matchCount; i++) {
         string stage = matchHistory[i].stage;
+        string group = matchHistory[i].group;
 
-        if (stage == "Opening Match" || stage == "Winners Match" || 
-            stage == "Elimination Match" || stage == "Decider Match") {
-            // Append Group letter if available
-            if (i >= 0 && i < 5) stage = "Group A - " + stage;
-            else if (i >= 5 && i < 10) stage = "Group B - " + stage;
-            else if (i >= 10 && i < 15) stage = "Group C - " + stage;
-            else if (i >= 15 && i < 20) stage = "Group D - " + stage;
+        if (!group.empty()) {
+            stage = group + " - " + stage;
         }
 
         cout << "[" << stage << "] ";
@@ -82,8 +80,8 @@ void performanceMenu() {
 }
 
 void simulateTestMatches() {
-    logMatch("Qualifiers", "Team Alpha", "Team Beta", "(2-1)", "Team Alpha");
-    logMatch("Group A", "Team Alpha", "Team Gamma", "(0-2)", "Team Gamma");
+    logMatch("Opening Match", "Team Alpha", "Team Beta", "(2-1)", "Team Alpha", "Group A");
+    logMatch("Winners Match", "Team Alpha", "Team Gamma", "(0-2)", "Team Gamma", "Group A");
     logMatch("Quarterfinal", "Team Gamma", "Team Delta", "(2-0)", "Team Gamma");
     logMatch("Semifinal", "Team Gamma", "Team Omega", "(2-1)", "Team Gamma");
 }
