@@ -29,7 +29,18 @@ void logMatch(string stage, string teamA, string teamB, string score, string win
 void viewMatchHistory() {
     cout << "\n=== Match History ===\n";
     for (int i = 0; i < matchCount; i++) {
-        cout << "[" << matchHistory[i].stage << "] ";
+        string stage = matchHistory[i].stage;
+
+        if (stage == "Opening Match" || stage == "Winners Match" || 
+            stage == "Elimination Match" || stage == "Decider Match") {
+            // Append Group letter if available
+            if (i >= 0 && i < 5) stage = "Group A - " + stage;
+            else if (i >= 5 && i < 10) stage = "Group B - " + stage;
+            else if (i >= 10 && i < 15) stage = "Group C - " + stage;
+            else if (i >= 15 && i < 20) stage = "Group D - " + stage;
+        }
+
+        cout << "[" << stage << "] ";
         cout << matchHistory[i].teamA << " vs " << matchHistory[i].teamB;
         cout << " " << matchHistory[i].score << " -> Winner: ";
         cout << matchHistory[i].winner << "\n";
@@ -42,22 +53,32 @@ void viewTeamPerformance() {
         cout << entry.first << " -> " << entry.second << " wins\n";
     }
 }
+
+void tournamentAnalysis() {
+    cout << "\n=== Tournament Analysis: Access Past Results ===\n";
+    cout << "Total Matches Logged: " << matchCount << "\n";
+    viewMatchHistory();
+    viewTeamPerformance();
+}
+
 void performanceMenu() {
-    int choice;
+    int opt;
     do {
-        cout << "\n=== Admin Menu: Match Logs & Performance ===\n";
+        cout << "\n=== Performance & Analysis Menu ===\n";
         cout << "1. View Match History\n";
-        cout << "2. View Team Performance Summary\n";
+        cout << "2. View Team Performance\n";
+        cout << "3. Full Tournament Analysis\n";
         cout << "0. Back\n";
         cout << "Choice: ";
-        cin >> choice;
-        switch (choice) {
+        cin >> opt;
+        switch (opt) {
             case 1: viewMatchHistory(); break;
             case 2: viewTeamPerformance(); break;
+            case 3: tournamentAnalysis(); break;
             case 0: break;
-            default: cout << "Invalid option.\n";
+            default: cout << "Invalid choice.\n";
         }
-    } while (choice != 0);
+    } while (opt != 0);
 }
 
 void simulateTestMatches() {
