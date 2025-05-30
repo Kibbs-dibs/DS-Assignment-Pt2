@@ -457,9 +457,9 @@ void addSpectator() {
     cin.ignore();
     cout << "Enter spectator name: ";
     getline(cin, s.name);
-    cout << "The Seats Types (VIP / Streamer / General): ";
+    cout << "Buy Seats Types (VIP / Streamer / General): ";
     getline(cin, s.type);
-    cout << "For Which Match Day (Qualifiers / Group Stage / Quarterfinal / Semifinal / Grand Final): ";
+    cout << "For Which Match Day (Qualifiers / Group Stage / Double Elimination Playoffs): ";
     getline(cin, s.stage);
     int index = getStageIndex(s.stage);
     if (index == -1) {
