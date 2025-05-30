@@ -17,7 +17,7 @@ struct Team {
     bool lastMinute = false;
 };
 
-Team registrationQueue[64], checkedIn[32];
+Team registrationQueue[40], checkedIn[32];
 int regCount = 0, checkedCount = 0;
 
 bool adminLogin() {
