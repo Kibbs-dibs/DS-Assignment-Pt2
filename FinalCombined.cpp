@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <queue>
+#include <limits>
 using namespace std;
 
 struct Team;
@@ -223,7 +224,11 @@ void processTeamCheckIn() {
 
     int choice;
     cout << "\nSelect your team number: ";
-    cin >> choice;
+    while (!(cin >> choice)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Invalid input. Please enter a number: ";
+    }
     cin.ignore();
 
     if (choice < 1 || choice > regCount || isTeamAlreadyCheckedIn(registrationQueue[choice - 1].name)) {
@@ -265,7 +270,11 @@ void adminMenu() {
         cout << "6. Match Logs & Team Performance\n";
         cout << "0. Exit\n";
         cout << "Choice: ";
-        cin >> choice;
+        while (!(cin >> choice)) {
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Please enter a number: ";
+        }
         switch (choice) {
             case 1: adminSingleCheckIn(); break;
             case 2: withdrawAndReplace(); break;
