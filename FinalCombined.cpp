@@ -25,6 +25,7 @@ struct Team {
     Player players[5];
     char regType[10];
     int points = 0;
+    bool lastMinute = false;
 };
 
 struct Spectator {
@@ -124,8 +125,13 @@ void readRegistrations() {
 
 void viewCheckedInTeams() {
     cout << "\n=== Checked-In Teams ===\n";
-    for (int i = 0; i < checkedCount; i++)
-        cout << i + 1 << ". " << checkedIn[i].name << " (" << checkedIn[i].regType << ")\n";
+    for (int i = 0; i < checkedCount; i++) {
+        cout << i + 1 << ". " << checkedIn[i].name << " (" << checkedIn[i].regType << ")";
+        if (checkedIn[i].lastMinute) {
+            cout << " [Last Minute Checked]";
+        }
+        cout << "\n";
+    }
     cout << "Total: " << checkedCount << "/32 teams\n";
 }
 
@@ -168,6 +174,7 @@ void adminSingleCheckIn() {
         strcpy(registrationQueue[choice - 1].regType, "general");
     }
 
+    registrationQueue[choice - 1].lastMinute = true;
     checkedIn[checkedCount++] = registrationQueue[choice - 1];
     cout << registrationQueue[choice - 1].name << " has been checked in.\n";
 }
