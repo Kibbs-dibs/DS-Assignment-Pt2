@@ -9,7 +9,7 @@ struct Spectator {
     string stage; // Qualifiers / Group Stage / Quarterfinal / Semifinal / Grand Final
 };
 
-string stages[] = {"Qualifiers", "Group Stage", "Quarterfinal", "Semifinal", "Grand Final"};
+string stages[] = {"Qualifiers", "Group Stage", "Double Elimination Playoffs", "Semifinal", "Grand Final"};
 const int MAX = 100;
 
 queue<Spectator> vipQueues[5];
