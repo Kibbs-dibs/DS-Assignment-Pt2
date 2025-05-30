@@ -15,6 +15,7 @@ struct MatchLog {
 MatchLog matchHistory[200];
 int matchCount = 0;
 map<string, int> teamWins;
+int sessionMatchStartIndex = 0;
 
 void logMatch(string stage, string teamA, string teamB, string score, string winner, string group = "") {
     MatchLog log;
@@ -29,8 +30,8 @@ void logMatch(string stage, string teamA, string teamB, string score, string win
 }
 
 void viewMatchHistory() {
-    cout << "\n=== Match History ===\n";
-    for (int i = 0; i < matchCount; i++) {
+    cout << "\n=== Match History (Current Session) ===\n";
+    for (int i = sessionMatchStartIndex; i < matchCount; i++) {
         string stage = matchHistory[i].stage;
         string group = matchHistory[i].group;
 
@@ -46,11 +47,16 @@ void viewMatchHistory() {
 }
 
 void viewTeamPerformance() {
-    cout << "\n=== Team Win Summary ===\n";
-    for (auto &entry : teamWins) {
+    cout << "\n=== Team Win Summary (Current Session) ===\n";
+    map<string, int> currentWins;
+    for (int i = sessionMatchStartIndex; i < matchCount; i++) {
+        currentWins[matchHistory[i].winner]++;
+    }
+    for (auto &entry : currentWins) {
         cout << entry.first << " -> " << entry.second << " wins\n";
     }
 }
+
 
 void tournamentAnalysis() {
     cout << "\n=== Tournament Analysis: Access Past Results ===\n";

@@ -43,45 +43,70 @@ Team simulateMatch(Team &a, Team &b, const char *stage, int bestOf, char scoreOu
     return (winsA > winsB) ? a : b;
 }
 
-void runGroupStage(Team group[4], char groupName) {
-    cout << "\n--- Group " << groupName << " Matches (Bracket Style) ---\n";
-    Team winner1 = simulateMatch(group[0], group[1], "Opening Match", 3, new char[10]);
-    Team loser1 = (strcmp(winner1.name, group[0].name) == 0) ? group[1] : group[0];
-    Team winner2 = simulateMatch(group[2], group[3], "Opening Match", 3, new char[10]);
-    Team loser2 = (strcmp(winner2.name, group[2].name) == 0) ? group[3] : group[2];
-    Team firstPlace = simulateMatch(winner1, winner2, "Winners Match", 3, new char[10]);
-    Team runnerUp = (strcmp(firstPlace.name, winner1.name) == 0) ? winner2 : winner1;
-    Team survivor = simulateMatch(loser1, loser2, "Elimination Match", 3, new char[10]);
-    Team secondPlace = simulateMatch(runnerUp, survivor, "Decider Match", 3, new char[10]);
-
-    cout << "\n--- Group " << groupName << " Final Standings ---\n";
-    cout << "1. " << firstPlace.name << " Qualified\n";
-    cout << "2. " << secondPlace.name << " Qualified\n";
-
-    for (int i = 0; i < 4; i++)
-        group[i].points = (strcmp(group[i].name, firstPlace.name) == 0 || strcmp(group[i].name, secondPlace.name) == 0) ? 3 : 0;
+void waitForUser(string stageName) {
+    string input;
+    cout << "\nType 'proceed' to continue to " << stageName << " or any other key to pause: ";
+    cin >> input;
+    if (input != "proceed") {
+        cout << stageName << " paused.\n";
+        exit(0);
+    }
 }
 
-Team runPlayoffs(Team top8[8]) {
-    const char* rounds[] = {"Quarterfinal", "Semifinal", "Final"};
-    Team round[8]; memcpy(round, top8, 8 * sizeof(Team));
+Team runDoubleElimination(Team top8[8]) {
     char score[10];
-    string input;
-    for (int r = 0, size = 8; r < 3; r++) {
-        Team next[4]; int idx = 0;
-        cout << rounds[r] << "s ready.\n";
-        cout << "Type 'proceed' to play the " << rounds[r] << " or any other key to cancel: ";
-        cin >> input;
-        if (input != "proceed") {
-            cout << "Tournament paused before " << rounds[r] << "s.\n";
-            exit(0);
-        }
-        for (int i = 0; i < size; i += 2)
-            next[idx++] = simulateMatch(round[i], round[i + 1], rounds[r], 5, score);
-        memcpy(round, next, idx * sizeof(Team));
-        size = idx;
+
+    // WB Quarterfinals
+    Team wbQWinners[4];
+    for (int i = 0; i < 4; i++)
+        wbQWinners[i] = simulateMatch(top8[i * 2], top8[i * 2 + 1], "WB Quarterfinal", 3, score);
+    waitForUser("LB Round 1");
+
+    // LB Round 1: Losers of WB QF
+    Team lbR1[4]; int lbIdx = 0;
+    for (int i = 0; i < 4; i++) {
+        if (strcmp(wbQWinners[i].name, top8[i * 2].name) == 0)
+            lbR1[lbIdx++] = top8[i * 2 + 1];
+        else
+            lbR1[lbIdx++] = top8[i * 2];
     }
-    return round[0];
+    Team lbR2[2];
+    lbR2[0] = simulateMatch(lbR1[0], lbR1[1], "LB Round 1", 3, score);
+    lbR2[1] = simulateMatch(lbR1[2], lbR1[3], "LB Round 1", 3, score);
+    waitForUser("WB Semifinal");
+
+    // WB Semifinals
+    Team wbSemiWinners[2];
+    Team wbSemiLosers[2];
+    for (int i = 0; i < 2; i++) {
+        Team winner = simulateMatch(wbQWinners[i * 2], wbQWinners[i * 2 + 1], "WB Semifinal", 3, score);
+        wbSemiWinners[i] = winner;
+        wbSemiLosers[i] = (strcmp(winner.name, wbQWinners[i * 2].name) == 0) ? wbQWinners[i * 2 + 1] : wbQWinners[i * 2];
+    }
+    waitForUser("LB Round 2");
+    
+    // LB Round 2
+    Team lbR3[2];
+    lbR3[0] = simulateMatch(lbR2[0], wbSemiLosers[0], "LB Round 2", 3, score);
+    lbR3[1] = simulateMatch(lbR2[1], wbSemiLosers[1], "LB Round 2", 3, score);
+    waitForUser("LB Final Qualifier");
+
+    // LB Final Qualifier
+    Team lbFinalQualifier = simulateMatch(lbR3[0], lbR3[1], "LB Final Qualifier", 3, score);
+    waitForUser("WB Final");
+
+    // WB Final
+    Team wbFinalWinner = simulateMatch(wbSemiWinners[0], wbSemiWinners[1], "WB Final", 3, score);
+    Team wbFinalLoser = (strcmp(wbFinalWinner.name, wbSemiWinners[0].name) == 0) ? wbSemiWinners[1] : wbSemiWinners[0];
+    waitForUser("LB Final");
+
+    // LB Final
+    Team lbFinal = simulateMatch(lbFinalQualifier, wbFinalLoser, "LB Final", 5, score);
+    waitForUser("Grand Final");
+
+    // Grand Final
+    Team champion = simulateMatch(wbFinalWinner, lbFinal, "Grand Final", 5, score);
+    return champion;
 }
 
 void showChampion(Team &champion) {
@@ -124,7 +149,7 @@ void startTournament(Team checkedIn[32]) {
     runGroupStage(groupD, 'D');
 
     cout << "\nGroup Stage completed.\n";
-    cout << "Type 'proceed' to continue to Playoffs (Quarterfinals) or any other key to cancel: ";
+    cout << "Type 'proceed' to continue to Playoffs (Double Elimination) or any other key to cancel: ";
     cin >> input;
     if (input != "proceed") {
         cout << "Tournament paused after Group Stage.\n";
@@ -139,8 +164,27 @@ void startTournament(Team checkedIn[32]) {
                 top8[idx++] = group[i];
     }
 
-    Team champion = runPlayoffs(top8);
+    Team champion = runDoubleElimination(top8);
     showChampion(champion);
+}
+
+void runGroupStage(Team group[4], char groupName) {
+    cout << "\n--- Group " << groupName << " Matches (Bracket Style) ---\n";
+    Team winner1 = simulateMatch(group[0], group[1], "Opening Match", 3, new char[10]);
+    Team loser1 = (strcmp(winner1.name, group[0].name) == 0) ? group[1] : group[0];
+    Team winner2 = simulateMatch(group[2], group[3], "Opening Match", 3, new char[10]);
+    Team loser2 = (strcmp(winner2.name, group[2].name) == 0) ? group[3] : group[2];
+    Team firstPlace = simulateMatch(winner1, winner2, "Winners Match", 3, new char[10]);
+    Team runnerUp = (strcmp(firstPlace.name, winner1.name) == 0) ? winner2 : winner1;
+    Team survivor = simulateMatch(loser1, loser2, "Elimination Match", 3, new char[10]);
+    Team secondPlace = simulateMatch(runnerUp, survivor, "Decider Match", 3, new char[10]);
+
+    cout << "\n--- Group " << groupName << " Final Standings ---\n";
+    cout << "1. " << firstPlace.name << " Qualified\n";
+    cout << "2. " << secondPlace.name << " Qualified\n";
+
+    for (int i = 0; i < 4; i++)
+        group[i].points = (strcmp(group[i].name, firstPlace.name) == 0 || strcmp(group[i].name, secondPlace.name) == 0) ? 3 : 0;
 }
 
 int main() {

@@ -1,0 +1,100 @@
+Qualifiers,Storm Vipers,Iron Wolves,(1-0),Storm Vipers
+Qualifiers,Crimson Knights,Shadow Hawks,(0-1),Shadow Hawks
+Qualifiers,Phantom Fury,Blazing Phoenix,(0-1),Blazing Phoenix
+Qualifiers,Night Stalkers,Rogue Titans,(0-1),Rogue Titans
+Qualifiers,Silent Force,Thunder Drakes,(0-1),Thunder Drakes
+Qualifiers,Frost Reapers,Venom Syndicate,(1-0),Frost Reapers
+Qualifiers,Obsidian Blades,Solar Strikers,(0-1),Solar Strikers
+Qualifiers,Wild Barrage,Dark Mirage,(1-0),Wild Barrage
+Qualifiers,Steel Tempest,Radiant Eclipse,(0-1),Radiant Eclipse
+Qualifiers,Chaos Legion,Lunar Vanguard,(0-1),Lunar Vanguard
+Qualifiers,Eclipse Falcons,Inferno Blades,(1-0),Eclipse Falcons
+Qualifiers,Cyber Ronins,Omega Force,(0-1),Omega Force
+Qualifiers,Skyfall Units,Ashen Order,(1-0),Skyfall Units
+Qualifiers,Ghost Division,Dawn Wardens,(1-0),Ghost Division
+Qualifiers,Storm Legion,Vortex Hunters,(0-1),Vortex Hunters
+Qualifiers,Quantum Pulse,Neon Howlers,(0-1),Neon Howlers
+Opening Match,Storm Vipers,Shadow Hawks,(2-0),Storm Vipers
+Opening Match,Blazing Phoenix,Rogue Titans,(2-1),Blazing Phoenix
+Winners Match,Storm Vipers,Blazing Phoenix,(2-0),Storm Vipers
+Elimination Match,Shadow Hawks,Rogue Titans,(2-1),Shadow Hawks
+Decider Match,Blazing Phoenix,Shadow Hawks,(2-1),Blazing Phoenix
+Opening Match,Thunder Drakes,Frost Reapers,(2-0),Thunder Drakes
+Opening Match,Solar Strikers,Wild Barrage,(0-2),Wild Barrage
+Winners Match,Thunder Drakes,Wild Barrage,(2-1),Thunder Drakes
+Elimination Match,Frost Reapers,Solar Strikers,(2-1),Frost Reapers
+Decider Match,Wild Barrage,Frost Reapers,(2-1),Wild Barrage
+Opening Match,Radiant Eclipse,Lunar Vanguard,(1-2),Lunar Vanguard
+Opening Match,Eclipse Falcons,Omega Force,(1-2),Omega Force
+Winners Match,Lunar Vanguard,Omega Force,(0-2),Omega Force
+Elimination Match,Radiant Eclipse,Eclipse Falcons,(1-2),Eclipse Falcons
+Decider Match,Lunar Vanguard,Eclipse Falcons,(2-0),Lunar Vanguard
+Opening Match,Skyfall Units,Ghost Division,(2-1),Skyfall Units
+Opening Match,Vortex Hunters,Neon Howlers,(1-2),Neon Howlers
+Winners Match,Skyfall Units,Neon Howlers,(2-0),Skyfall Units
+Elimination Match,Ghost Division,Vortex Hunters,(2-1),Ghost Division
+Decider Match,Neon Howlers,Ghost Division,(2-1),Neon Howlers
+WB Quarterfinal,Storm Vipers,Blazing Phoenix,(2-0),Storm Vipers
+WB Quarterfinal,Thunder Drakes,Wild Barrage,(2-1),Thunder Drakes
+WB Quarterfinal,Lunar Vanguard,Omega Force,(1-2),Omega Force
+WB Quarterfinal,Skyfall Units,Neon Howlers,(0-2),Neon Howlers
+LB Round 1,Blazing Phoenix,Wild Barrage,(2-1),Blazing Phoenix
+LB Round 1,Lunar Vanguard,Skyfall Units,(1-2),Skyfall Units
+WB Semifinal,Storm Vipers,Thunder Drakes,(1-2),Thunder Drakes
+WB Semifinal,Omega Force,Neon Howlers,(1-2),Neon Howlers
+LB Round 2,Blazing Phoenix,Storm Vipers,(1-2),Storm Vipers
+LB Round 2,Skyfall Units,Omega Force,(2-1),Skyfall Units
+LB Final Qualifier,Storm Vipers,Skyfall Units,(2-0),Storm Vipers
+WB Final,Thunder Drakes,Neon Howlers,(2-0),Thunder Drakes
+LB Final,Storm Vipers,Neon Howlers,(3-1),Storm Vipers
+Grand Final,Thunder Drakes,Storm Vipers,(3-0),Thunder Drakes
+Qualifiers,Storm Vipers,Iron Wolves,(1-0),Storm Vipers
+Qualifiers,Crimson Knights,Shadow Hawks,(0-1),Shadow Hawks
+Qualifiers,Phantom Fury,Blazing Phoenix,(0-1),Blazing Phoenix
+Qualifiers,Night Stalkers,Rogue Titans,(0-1),Rogue Titans
+Qualifiers,Silent Force,Thunder Drakes,(0-1),Thunder Drakes
+Qualifiers,Frost Reapers,Venom Syndicate,(0-1),Venom Syndicate
+Qualifiers,Obsidian Blades,Solar Strikers,(1-0),Obsidian Blades
+Qualifiers,Wild Barrage,Dark Mirage,(0-1),Dark Mirage
+Qualifiers,Steel Tempest,Radiant Eclipse,(0-1),Radiant Eclipse
+Qualifiers,Chaos Legion,Lunar Vanguard,(0-1),Lunar Vanguard
+Qualifiers,Eclipse Falcons,Inferno Blades,(0-1),Inferno Blades
+Qualifiers,Cyber Ronins,Omega Force,(1-0),Cyber Ronins
+Qualifiers,Skyfall Units,Ashen Order,(1-0),Skyfall Units
+Qualifiers,Ghost Division,Dawn Wardens,(1-0),Ghost Division
+Qualifiers,Storm Legion,Vortex Hunters,(0-1),Vortex Hunters
+Qualifiers,Quantum Pulse,Neon Howlers,(1-0),Quantum Pulse
+Opening Match,Storm Vipers,Shadow Hawks,(2-0),Storm Vipers
+Opening Match,Blazing Phoenix,Rogue Titans,(1-2),Rogue Titans
+Winners Match,Storm Vipers,Rogue Titans,(2-0),Storm Vipers
+Elimination Match,Shadow Hawks,Blazing Phoenix,(2-0),Shadow Hawks
+Decider Match,Rogue Titans,Shadow Hawks,(2-1),Rogue Titans
+Opening Match,Thunder Drakes,Venom Syndicate,(2-1),Thunder Drakes
+Opening Match,Obsidian Blades,Dark Mirage,(0-2),Dark Mirage
+Winners Match,Thunder Drakes,Dark Mirage,(2-1),Thunder Drakes
+Elimination Match,Venom Syndicate,Obsidian Blades,(2-0),Venom Syndicate
+Decider Match,Dark Mirage,Venom Syndicate,(1-2),Venom Syndicate
+Opening Match,Radiant Eclipse,Lunar Vanguard,(1-2),Lunar Vanguard
+Opening Match,Inferno Blades,Cyber Ronins,(2-0),Inferno Blades
+Winners Match,Lunar Vanguard,Inferno Blades,(2-0),Lunar Vanguard
+Elimination Match,Radiant Eclipse,Cyber Ronins,(2-1),Radiant Eclipse
+Decider Match,Inferno Blades,Radiant Eclipse,(2-1),Inferno Blades
+Opening Match,Skyfall Units,Ghost Division,(1-2),Ghost Division
+Opening Match,Vortex Hunters,Quantum Pulse,(1-2),Quantum Pulse
+Winners Match,Ghost Division,Quantum Pulse,(2-0),Ghost Division
+Elimination Match,Skyfall Units,Vortex Hunters,(2-0),Skyfall Units
+Decider Match,Quantum Pulse,Skyfall Units,(1-2),Skyfall Units
+WB Quarterfinal,Storm Vipers,Rogue Titans,(1-2),Rogue Titans
+WB Quarterfinal,Thunder Drakes,Venom Syndicate,(0-2),Venom Syndicate
+WB Quarterfinal,Lunar Vanguard,Inferno Blades,(2-0),Lunar Vanguard
+WB Quarterfinal,Skyfall Units,Ghost Division,(2-1),Skyfall Units
+LB Round 1,Storm Vipers,Thunder Drakes,(1-2),Thunder Drakes
+LB Round 1,Inferno Blades,Ghost Division,(2-0),Inferno Blades
+WB Semifinal,Rogue Titans,Venom Syndicate,(2-0),Rogue Titans
+WB Semifinal,Lunar Vanguard,Skyfall Units,(2-1),Lunar Vanguard
+LB Round 2,Thunder Drakes,Venom Syndicate,(1-2),Venom Syndicate
+LB Round 2,Inferno Blades,Skyfall Units,(2-0),Inferno Blades
+LB Final Qualifier,Venom Syndicate,Inferno Blades,(0-2),Inferno Blades
+WB Final,Rogue Titans,Lunar Vanguard,(1-2),Lunar Vanguard
+LB Final,Inferno Blades,Rogue Titans,(3-0),Inferno Blades
+Grand Final,Lunar Vanguard,Inferno Blades,(2-3),Inferno Blades
