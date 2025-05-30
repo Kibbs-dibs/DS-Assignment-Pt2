@@ -27,6 +27,11 @@ void logMatch(string stage, string teamA, string teamB, string score, string win
     log.winner = winner;
     matchHistory[matchCount++] = log;
     teamWins[winner]++;
+    
+    ofstream outFile("match_logs.txt", ios::app);
+    if (outFile.is_open()) {
+        outFile << stage << "," << teamA << "," << teamB << "," << score << "," << winner << "\n";
+        outFile.close();
 }
 
 void viewMatchHistory() {
